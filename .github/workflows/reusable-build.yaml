@@ -41,7 +41,7 @@ jobs:
 #          node-version: 18
 
       - name: Build BE
-        run: cd ../property-hub-be && npm install && npm run build && ./create-lambda-zip.sh
+        run: echo $(pwd) && cd ../property-hub-be && npm install && npm run build && ./create-lambda-zip.sh
 
       - name: Upload dist artifact
         uses: actions/upload-artifact@v3
