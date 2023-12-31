@@ -23,7 +23,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: dist-artifact-fe
-          path: dist
+          path: property-hub-fe/dist
 
   build-be:
     runs-on: ubuntu-latest
@@ -46,4 +46,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: dist-artifact-be
-          path: nest-lambda.zip
+          path: property-hub-be/nest-lambda.zip
