@@ -1,0 +1,43 @@
+on:
+  workflow_call:
+    inputs:
+      workspace:
+        required: true
+        type: string
+    secrets:
+      aws-secret-access-key:
+        required: true
+      aws-access-key-id:
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      DOWNLOAD_PATH: artifacts
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.2
+
+      - name: Terraform Prepare
+        run: |
+          cd infrastructure
+          terraform init
+          terraform validate
+          terraform workspace select -or-create ${{ inputs.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.aws-access-key-id }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.aws-secret-access-key }}
+      - name: Terraform Apply
+        run: |
+          cd infrastructure
+          terraform plan -out tf.plan
+          terraform apply -auto-approve tf.plan
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.aws-access-key-id }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.aws-secret-access-key }}
