@@ -5,13 +5,13 @@ on:
         required: true
         type: string
     secrets:
-      secrets:
-        aws-secret-access-key:
-          required: true
-        aws-access-key-id:
-          required: true
-        cloudfront-target:
-          required: true
+      aws-secret-access-key:
+        required: true
+      aws-access-key-id:
+        required: true
+      cloudfront-target:
+        required: true
+
 
 jobs:
   deploy-be:
