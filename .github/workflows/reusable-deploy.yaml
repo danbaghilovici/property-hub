@@ -5,19 +5,29 @@ on:
         required: true
         type: string
     secrets:
-      aws-secret-access-key:
-        required: true
-      aws-access-key-id:
-        required: true
+      secrets:
+        aws-secret-access-key:
+          required: true
+        aws-access-key-id:
+          required: true
+        cloudfront-target:
+          required: true
 
 jobs:
-  deploy:
+  deploy-be:
     runs-on: ubuntu-latest
     env:
       DOWNLOAD_PATH: artifacts
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Get build zip
+        id: download
+        uses: actions/download-artifact@v3
+        with:
+          name: dist-artifact-be
+          path: ${{ env.DOWNLOAD_PATH }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -36,8 +46,30 @@ jobs:
       - name: Terraform Apply
         run: |
           cd infrastructure
-          terraform plan -out tf.plan
+          terraform plan -var="lambda_payload_filename=../$DOWNLOAD_PATH/nest-lambda.zip" -out tf.plan
           terraform apply -auto-approve tf.plan
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.aws-access-key-id }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.aws-secret-access-key }}
+
+  deploy-fe:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.event.ref == 'refs/heads/main'
+    steps:
+      - uses: aws-actions/configure-aws-credentials@master
+        with:
+          aws-access-key-id: ${{ secrets.aws-access-key-id }}
+          aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
+          aws-region: eu-central-1
+
+      - name: Fetch fe artifacts from build job
+        uses: actions/download-artifact@v3
+        with:
+          name: dist-artifact-fe
+          path: dist-artifact-fe
+
+      - name: Copy all assets except html to S3 bucket, caching forever
+        run: aws s3 sync ./dist-artifact-fe/property-hub-fe s3://${{secrets.cloudfront-target}} --exclude "*.html" --cache-control max-age=31536000
+
+      - name: Copy index.html to S3 bucket, setting a low cache time, so users always get the recent version
+        run: aws s3 cp ./dist-artifact-fe/property-hub-fe/index.html s3://${{secrets.cloudfront-target}}/index.html --cache-control max-age=10

@@ -10,10 +10,6 @@ jobs:
   build:
     name: Main branch build
     uses: ./.github/workflows/reusable-build.yaml
-    secrets:
-      aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      cloudfront-target: ${{ secrets.CLOUDFRONT_TARGET }}
   deploy:
     name: Main branch deploy
     needs: build
@@ -23,5 +19,6 @@ jobs:
     secrets:
       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      cloudfront-target: ${{ secrets.CLOUDFRONT_TARGET }}
 
 

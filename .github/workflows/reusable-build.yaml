@@ -1,16 +1,12 @@
 on:
   workflow_call:
-    secrets:
-      aws-secret-access-key:
-        required: true
-      aws-access-key-id:
-        required: true
-      cloudfront-target:
-        required: true
 
 jobs:
-  build:
+  build-fe:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./property-hub-fe
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,40 +16,34 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build Angular app
-        run: npm run build
+      - name: Build FE
+        run: npm install && npm run build
 
       - name: Upload dist artifact
         uses: actions/upload-artifact@v3
         with:
-          name: dist-artifact
+          name: dist-artifact-fe
           path: dist
 
-      - name: Build lambdas
-        run: cd lambdas && npm install && npm run build
-
-  deploy:
-    needs: build
+  build-be:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.event.ref == 'refs/heads/main'
+    defaults:
+      run:
+        working-directory: ./property-hub-be
     steps:
-      - uses: aws-actions/configure-aws-credentials@master
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          aws-access-key-id: ${{ secrets.aws-access-key-id }}
-          aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
-          aws-region: eu-central-1
+          node-version: 18
 
-      - name: Fetch artifacts from build job
-        uses: actions/download-artifact@v3
+      - name: Build BE
+        run: npm install && npm run build && ./create-lambda-zip.sh
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v3
         with:
-          name: dist-artifact
-          path: dist-artifact
-
-      - name: Copy all assets except html to S3 bucket, caching forever
-        run: aws s3 sync ./dist-artifact/property-hub-fe s3://${{secrets.cloudfront-target}} --exclude "*.html" --cache-control max-age=31536000
-
-      - name: Copy index.html to S3 bucket, setting a low cache time, so users always get the recent version
-        run: aws s3 cp ./dist-artifact/property-hub-fe/index.html s3://${{secrets.cloudfront-target}}/index.html --cache-control max-age=10
+          name: dist-artifact-be
+          path: nest-lambda.zip
