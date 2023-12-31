@@ -41,7 +41,7 @@ jobs:
 #          node-version: 18
 
       - name: Build BE
-        working-directory: ./property-hub-be
+        working-directory: property-hub-be
         run: npm install && npm run build && ./create-lambda-zip.sh
 
       - name: Upload dist artifact
