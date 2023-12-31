@@ -5,6 +5,9 @@ jobs:
   build-fe:
     runs-on: ubuntu-latest
     steps:
+      - name: Swap dirs
+        run: echo ${{ github.workspace }}
+
       - name: Checkout
         uses: actions/checkout@v4
 
