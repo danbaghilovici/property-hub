@@ -27,10 +27,10 @@ jobs:
 
   build-be:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./property-hub-be
     steps:
+      - name: Swap dirs
+        run: cd ../property-hub-be
+
       - name: Checkout
         uses: actions/checkout@v4
 
