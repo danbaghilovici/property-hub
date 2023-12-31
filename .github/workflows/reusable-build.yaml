@@ -29,6 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Swap dirs
+        working-directory: ./property-hub-be
         run: echo $(pwd)
 
       - name: Checkout
