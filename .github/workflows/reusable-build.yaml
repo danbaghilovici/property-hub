@@ -4,9 +4,6 @@ on:
 jobs:
   build-fe:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./property-hub-fe
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -17,7 +14,7 @@ jobs:
           node-version: 18
 
       - name: Build FE
-        run: npm install && npm run build
+        run: cd property-hub-fe && npm install && npm run build
 
       - name: Upload dist artifact
         uses: actions/upload-artifact@v3
@@ -40,8 +37,7 @@ jobs:
 #          node-version: 18
 
       - name: Build BE
-        working-directory: ${{ github.workspace }}/property-hub-be
-        run: npm install && npm run build && ./create-lambda-zip.sh
+        run: cd property-hub-be && npm install && npm run build && ./create-lambda-zip.sh
 
       - name: Upload dist artifact
         uses: actions/upload-artifact@v3
