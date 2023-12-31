@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Swap dirs
-        run: cd .. && cd property-hub-be
+        run: pwd && cd .. && cd property-hub-be
 
       - name: Checkout
         uses: actions/checkout@v4
