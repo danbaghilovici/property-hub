@@ -28,9 +28,8 @@ jobs:
   build-be:
     runs-on: ubuntu-latest
     steps:
-#      - name: Swap dirs
-#        working-directory: ../property-hub-be
-#        run: echo $(pwd)
+      - name: Swap dirs
+        run: echo ${{ github.workspace }}
 
 #      - name: Checkout
 #        uses: actions/checkout@v4
