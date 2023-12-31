@@ -28,9 +28,9 @@ jobs:
   build-be:
     runs-on: ubuntu-latest
     steps:
-      - name: Swap dirs
-        working-directory: ../property-hub-be
-        run: echo $(pwd)
+#      - name: Swap dirs
+#        working-directory: ../property-hub-be
+#        run: echo $(pwd)
 
 #      - name: Checkout
 #        uses: actions/checkout@v4
